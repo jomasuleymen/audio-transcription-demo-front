@@ -1,0 +1,32 @@
+query GetAllJobs {
+	jobs {
+		id
+		status
+		fileName
+	}
+}
+
+query GetJob($id: ID!) {
+	job(id: $id) {
+		id
+		status
+		fileName
+		s3Url
+		transcriptionText
+	}
+}
+
+mutation CreateTranscriptionJob($fileName: String!, $contentType: String!) {
+	createTranscriptionJob(fileName: $fileName, contentType: $contentType) {
+		job {
+			id
+		}
+		uploadUrl
+	}
+}
+
+mutation ConfirmFileUpload($id: ID!) {
+	confirmFileUpload(id: $id) {
+		id
+	}
+}
