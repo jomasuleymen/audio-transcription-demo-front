@@ -7,12 +7,18 @@
    npm install
    ```
 
-2. **Start development server:**
+2. **Environment configuration:**
+   Create `.env` file in the root with the required variables (see `.env.example`).
+   ```bash
+   cp .env.example .env
+   ```
+
+3. **Start development server:**
    ```bash
    npm run dev
    ```
 
-3. **Build for production:**
+4. **Build for production:**
    ```bash
    npm run build
    npm run preview
