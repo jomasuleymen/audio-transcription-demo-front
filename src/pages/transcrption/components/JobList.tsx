@@ -25,9 +25,9 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
 				cursor: 'pointer',
 				padding: '16px',
 				backgroundColor: isSelected ? token.colorPrimaryBg : 'transparent',
-				borderRadius: isSelected ? token.borderRadius : 0,
 				border: isSelected ? `1px solid ${token.colorPrimary}` : '1px solid transparent',
-				margin: isSelected ? '2px' : '0',
+				borderRadius: token.borderRadius,
+				margin: 2,
 			}}
 			onClick={() => setSelectedJobId(job.id)}
 			onMouseEnter={(e) => {
@@ -47,7 +47,6 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
 					style={{
 						backgroundColor: isSelected ? token.colorPrimary : token.colorBgContainer,
 						color: isSelected ? 'white' : token.colorTextSecondary,
-						flexShrink: 0,
 					}}
 				/>
 				<Flex vertical style={{ flex: 1, minWidth: 0 }}>
@@ -55,8 +54,6 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
 						strong={isSelected}
 						style={{
 							color: isSelected ? token.colorPrimary : token.colorText,
-							fontSize: 14,
-							lineHeight: '20px',
 						}}
 						ellipsis={{ tooltip: job.fileName }}
 					>
@@ -72,7 +69,9 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
 };
 
 export const JobList: React.FC = () => {
-	const { data, loading, startPolling, stopPolling } = useGetAllJobsQuery();
+	const { data, loading, startPolling, stopPolling } = useGetAllJobsQuery({
+		fetchPolicy: 'no-cache',
+	});
 
 	useEffect(() => {
 		const jobs = data?.jobs;
@@ -110,7 +109,7 @@ export const JobList: React.FC = () => {
 			<div style={{ padding: '32px 16px', textAlign: 'center' }}>
 				<Empty
 					image={Empty.PRESENTED_IMAGE_SIMPLE}
-					description={<span style={{ color: '#999' }}>No audio files uploaded yet</span>}
+					description="No audio files uploaded yet"
 				/>
 			</div>
 		);

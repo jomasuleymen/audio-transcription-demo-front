@@ -1,7 +1,7 @@
 import {
-  GetAllJobsDocument,
-  useConfirmFileUploadMutation,
-  useCreateTranscriptionJobMutation,
+	GetAllJobsDocument,
+	useConfirmFileUploadMutation,
+	useCreateTranscriptionJobMutation,
 } from '@/generated/graphql';
 import { MESSAGES } from '@/shared/constants';
 import { useApolloClient } from '@apollo/client';
@@ -9,7 +9,7 @@ import { message } from 'antd';
 import axios from 'axios';
 import { useCallback, useState } from 'react';
 
-export const useFileUpload = () => {
+export const useJobFileUpload = () => {
 	const [createJob] = useCreateTranscriptionJobMutation();
 	const [confirmUpload] = useConfirmFileUploadMutation();
 	const client = useApolloClient();
@@ -17,11 +17,6 @@ export const useFileUpload = () => {
 
 	const uploadFile = useCallback(
 		async (file: File) => {
-			if (!file.type.startsWith('audio/')) {
-				message.error(MESSAGES.INVALID_FILE);
-				return;
-			}
-
 			setUploading(true);
 
 			try {
@@ -39,11 +34,7 @@ export const useFileUpload = () => {
 
 				const { job, uploadUrl } = createData.createTranscriptionJob;
 
-				await axios.put(uploadUrl, file, {
-					headers: {
-						'Content-Type': file.type,
-					},
-				});
+				await axios.put(uploadUrl, file);
 
 				await confirmUpload({ variables: { id: job.id } });
 

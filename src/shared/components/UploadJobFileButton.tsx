@@ -1,19 +1,25 @@
-import { useFileUpload } from '@/shared/hooks/useFileUpload';
+import { useJobFileUpload } from '@/shared/hooks/useJobFileUpload';
 import { CloudUploadOutlined } from '@ant-design/icons';
 import { Button, Flex, Typography, Upload } from 'antd';
 import React from 'react';
 
 const { Text } = Typography;
 
-export const UploadJobFileButton: React.FC = () => {
-	const { uploadFile, uploading } = useFileUpload();
+type Props = {
+	accept: string;
+	buttonText: string;
+	description?: string;
+};
+
+export const UploadJobFileButton: React.FC<Props> = ({ accept, buttonText, description }) => {
+	const { uploadFile, uploading } = useJobFileUpload();
 
 	return (
 		<div style={{ display: 'flex', justifyContent: 'center' }}>
 			<Upload
 				name="file"
 				multiple={false}
-				accept="audio/*"
+				accept={accept}
 				showUploadList={false}
 				customRequest={({ file }: any) => uploadFile(file)}
 				style={{ width: '100%', maxWidth: 400 }}
@@ -26,24 +32,20 @@ export const UploadJobFileButton: React.FC = () => {
 					style={{
 						height: 64,
 						width: '100%',
-						maxWidth: 400,
-						fontSize: 16,
-						fontWeight: 500,
 					}}
 				>
 					<Flex vertical align="center" gap={4}>
-						<span style={{ fontSize: 16 }}>
-							{uploading ? 'Uploading...' : 'Upload Audio File'}
+						<span>
+							{uploading ? 'Uploading...' : buttonText}
 						</span>
 						<Text
 							type="secondary"
 							style={{
 								fontSize: 12,
 								color: 'white',
-								margin: 0,
 							}}
 						>
-							Supports MP3, WAV, M4A and more
+							{description}
 						</Text>
 					</Flex>
 				</Button>
