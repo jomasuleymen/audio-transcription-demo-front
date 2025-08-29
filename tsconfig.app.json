@@ -1,0 +1,50 @@
+{
+	"compilerOptions": {
+		/* Language & Compilation */
+		"target": "ES2023",
+		"useDefineForClassFields": true,
+		"lib": ["ES2023", "DOM", "DOM.Iterable"],
+
+		/* Module & Resolution */
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"moduleDetection": "force",
+		"allowImportingTsExtensions": true,
+		"isolatedModules": true,
+		"noEmit": true,
+		"jsx": "react-jsx",
+
+		/* Type Checking */
+		"strict": true,
+		"skipLibCheck": true,
+		"skipDefaultLibCheck": true,
+		"forceConsistentCasingInFileNames": true,
+		"useUnknownInCatchVariables": true,
+
+		/* Linting & Code Quality */
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noFallthroughCasesInSwitch": true,
+		"removeComments": true,
+
+		"noUncheckedIndexedAccess": true,
+
+		/* Path Aliases */
+		"paths": {
+			"@/*": ["./src/*"]
+		},
+
+		/* Other */
+		"types": ["vite/client", "node"],
+		"allowSyntheticDefaultImports": true,
+		"resolveJsonModule": true,
+		"esModuleInterop": true
+	},
+
+	"ts-node": {
+		"require": ["tsconfig-paths/register"]
+	},
+
+	"include": ["src", "global.d.ts"],
+	"exclude": ["node_modules", "dist"]
+}
