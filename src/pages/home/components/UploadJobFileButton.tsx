@@ -1,83 +1,53 @@
-import {
-	GetAllJobsDocument,
-	useConfirmFileUploadMutation,
-	useCreateTranscriptionJobMutation,
-} from '@/generated/graphql';
-import UploadOutlined from '@ant-design/icons/UploadOutlined';
-import { useApolloClient } from '@apollo/client';
-import { Button, message, Upload } from 'antd';
-import axios from 'axios';
-import React, { useCallback, useState } from 'react';
+import { useFileUpload } from '@/shared/hooks/useFileUpload';
+import { CloudUploadOutlined } from '@ant-design/icons';
+import { Button, Flex, Typography, Upload } from 'antd';
+import React from 'react';
 
-type Props = {};
+const { Text } = Typography;
 
-const UploadJobFileButton: React.FC<Props> = ({}) => {
-	const [createJob] = useCreateTranscriptionJobMutation();
-	const [confirmUpload] = useConfirmFileUploadMutation();
-	const client = useApolloClient();
-
-	const [uploading, setUploading] = useState(false);
-
-	const handleUpload = useCallback(
-		async (file: File) => {
-			if (!file.type.startsWith('audio/')) {
-				message.error('Please select an audio file');
-				return;
-			}
-
-			setUploading(true);
-
-			try {
-				// Step 1: Create transcription job
-				const { data: createData } = await createJob({
-					variables: {
-						fileName: file.name,
-						contentType: file.type,
-					},
-				});
-
-				if (!createData?.createTranscriptionJob) {
-					throw new Error('Failed to create job');
-				}
-
-				const { job, uploadUrl } = createData.createTranscriptionJob;
-
-				// Step 2: Upload file to S3 using presigned URL
-				await axios.put(uploadUrl, file, {
-					headers: {
-						'Content-Type': file.type,
-					},
-				});
-
-				// Step 3: Confirm upload
-				await confirmUpload({ variables: { id: job.id } });
-
-				client.refetchQueries({
-					include: [GetAllJobsDocument],
-				});
-
-				message.success('File uploaded successfully! Processing started.');
-			} catch (error) {
-				console.error('Upload failed:', error);
-				message.error('Upload failed. Please try again.');
-			} finally {
-				setUploading(false);
-			}
-		},
-		[createJob, confirmUpload]
-	);
+export const UploadJobFileButton: React.FC = () => {
+	const { uploadFile, uploading } = useFileUpload();
 
 	return (
-		<Upload
-			name="file"
-			multiple={false}
-			accept="audio/*"
-			showUploadList={false}
-			customRequest={({ file }: any) => handleUpload(file)}
-		>
-			<Button icon={<UploadOutlined />}>Click to Upload</Button>
-		</Upload>
+		<div style={{ display: 'flex', justifyContent: 'center' }}>
+			<Upload
+				name="file"
+				multiple={false}
+				accept="audio/*"
+				showUploadList={false}
+				customRequest={({ file }: any) => uploadFile(file)}
+				style={{ width: '100%', maxWidth: 400 }}
+			>
+				<Button
+					type="primary"
+					size="large"
+					loading={uploading}
+					icon={<CloudUploadOutlined />}
+					style={{
+						height: 64,
+						width: '100%',
+						maxWidth: 400,
+						fontSize: 16,
+						fontWeight: 500,
+					}}
+				>
+					<Flex vertical align="center" gap={4}>
+						<span style={{ fontSize: 16 }}>
+							{uploading ? 'Uploading...' : 'Upload Audio File'}
+						</span>
+						<Text
+							type="secondary"
+							style={{
+								fontSize: 12,
+								color: 'white',
+								margin: 0,
+							}}
+						>
+							Supports MP3, WAV, M4A and more
+						</Text>
+					</Flex>
+				</Button>
+			</Upload>
+		</div>
 	);
 };
-
-export default UploadJobFileButton;

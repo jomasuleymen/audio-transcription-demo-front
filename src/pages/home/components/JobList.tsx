@@ -1,7 +1,13 @@
-import { GetAllJobsQuery, useGetAllJobsQuery } from '@/generated/graphql';
+import { GetAllJobsQuery, JobStatus, useGetAllJobsQuery } from '@/generated/graphql';
+import { StatusTag } from '@/shared/components/StatusTag';
 import { useTranscriptionJobs } from '@/stores/jobs.store';
-import { List, Typography } from 'antd';
-import React from 'react';
+import { AudioOutlined } from '@ant-design/icons';
+import { Avatar, Empty, Flex, List, Skeleton, theme, Typography } from 'antd';
+import React, { useEffect } from 'react';
+
+const { Text } = Typography;
+
+const JOBS_LIST_POLLING_INTERVAL = 2500;
 
 interface JobItemProps {
 	job: GetAllJobsQuery['jobs'][number];
@@ -10,31 +16,111 @@ interface JobItemProps {
 const JobItem: React.FC<JobItemProps> = ({ job }) => {
 	const selectedJobId = useTranscriptionJobs((state) => state.selectedJobId);
 	const setSelectedJobId = useTranscriptionJobs((state) => state.setSelectedJobId);
+	const { token } = theme.useToken();
+	const isSelected = selectedJobId === job.id;
 
 	return (
 		<List.Item
 			style={{
 				cursor: 'pointer',
-				backgroundColor: selectedJobId === job.id ? 'lightgray' : 'white',
+				padding: '16px',
+				backgroundColor: isSelected ? token.colorPrimaryBg : 'transparent',
+				borderRadius: isSelected ? token.borderRadius : 0,
+				border: isSelected ? `1px solid ${token.colorPrimary}` : '1px solid transparent',
+				margin: isSelected ? '2px' : '0',
 			}}
 			onClick={() => setSelectedJobId(job.id)}
+			onMouseEnter={(e) => {
+				if (!isSelected) {
+					e.currentTarget.style.backgroundColor = token.colorBgTextHover;
+				}
+			}}
+			onMouseLeave={(e) => {
+				if (!isSelected) {
+					e.currentTarget.style.backgroundColor = 'transparent';
+				}
+			}}
 		>
-			<Typography.Text>{job.fileName}</Typography.Text>
+			<Flex align="center" gap={12} style={{ width: '100%' }}>
+				<Avatar
+					icon={<AudioOutlined />}
+					style={{
+						backgroundColor: isSelected ? token.colorPrimary : token.colorBgContainer,
+						color: isSelected ? 'white' : token.colorTextSecondary,
+						flexShrink: 0,
+					}}
+				/>
+				<Flex vertical style={{ flex: 1, minWidth: 0 }}>
+					<Text
+						strong={isSelected}
+						style={{
+							color: isSelected ? token.colorPrimary : token.colorText,
+							fontSize: 14,
+							lineHeight: '20px',
+						}}
+						ellipsis={{ tooltip: job.fileName }}
+					>
+						{job.fileName}
+					</Text>
+					<div style={{ marginTop: 4 }}>
+						<StatusTag status={job.status} />
+					</div>
+				</Flex>
+			</Flex>
 		</List.Item>
 	);
 };
 
-type JobListProps = {};
-const JobList: React.FC<JobListProps> = ({}) => {
-	const { data, loading } = useGetAllJobsQuery();
+export const JobList: React.FC = () => {
+	const { data, loading, startPolling, stopPolling } = useGetAllJobsQuery();
+
+	useEffect(() => {
+		const jobs = data?.jobs;
+		const hasActiveJobs = jobs?.some(
+			(job) => job.status === JobStatus.Processing || job.status === JobStatus.Waiting
+		);
+
+		if (hasActiveJobs) {
+			startPolling(JOBS_LIST_POLLING_INTERVAL);
+		} else {
+			stopPolling();
+		}
+
+		return () => stopPolling();
+	}, [data?.jobs, startPolling, stopPolling]);
+
+	if (loading) {
+		return (
+			<div style={{ padding: '16px' }}>
+				{Array.from({ length: 3 }).map((_, index) => (
+					<Skeleton
+						key={index}
+						active
+						avatar
+						paragraph={{ rows: 1 }}
+						style={{ marginBottom: 16 }}
+					/>
+				))}
+			</div>
+		);
+	}
+
+	if (!data?.jobs?.length) {
+		return (
+			<div style={{ padding: '32px 16px', textAlign: 'center' }}>
+				<Empty
+					image={Empty.PRESENTED_IMAGE_SIMPLE}
+					description={<span style={{ color: '#999' }}>No audio files uploaded yet</span>}
+				/>
+			</div>
+		);
+	}
 
 	return (
 		<List
-			bordered
-			dataSource={data?.jobs || []}
+			dataSource={data.jobs}
 			renderItem={(item) => <JobItem key={item.id} job={item} />}
+			style={{ height: '100%', overflow: 'auto' }}
 		/>
 	);
 };
-
-export default JobList;
