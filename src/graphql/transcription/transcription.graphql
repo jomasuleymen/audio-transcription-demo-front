@@ -3,6 +3,7 @@ query GetTranscriptionJobs {
 		id
 		status
 		fileName
+		createdAt
 	}
 }
 

@@ -76,7 +76,7 @@ export enum TranscriptionJobStatus {
 export type GetTranscriptionJobsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetTranscriptionJobsQuery = { __typename?: 'Query', transcriptionJobs: Array<{ __typename?: 'TranscriptionJob', id: string, status: TranscriptionJobStatus, fileName: string }> };
+export type GetTranscriptionJobsQuery = { __typename?: 'Query', transcriptionJobs: Array<{ __typename?: 'TranscriptionJob', id: string, status: TranscriptionJobStatus, fileName: string, createdAt: any }> };
 
 export type GetTranscriptionJobQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -106,6 +106,7 @@ export const GetTranscriptionJobsDocument = gql`
     id
     status
     fileName
+    createdAt
   }
 }
     `;

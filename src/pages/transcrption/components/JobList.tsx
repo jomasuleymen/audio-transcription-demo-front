@@ -13,6 +13,17 @@ const { Text } = Typography;
 
 const JOBS_LIST_POLLING_INTERVAL = 2500;
 
+const formatCreatedAt = (createdAt: string): string => {
+	const date = new Date(createdAt);
+	return date.toLocaleString('ru-RU', {
+		day: '2-digit',
+		month: '2-digit',
+		year: 'numeric',
+		hour: '2-digit',
+		minute: '2-digit',
+	});
+};
+
 interface JobItemProps {
 	job: GetTranscriptionJobsQuery['transcriptionJobs'][number];
 }
@@ -63,9 +74,18 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
 					>
 						{job.fileName}
 					</Text>
-					<div style={{ marginTop: 4 }}>
+					<Flex align="center" gap={8} style={{ marginTop: 4 }}>
 						<StatusTag status={job.status} />
-					</div>
+						<Text
+							type="secondary"
+							style={{
+								fontSize: '12px',
+								color: token.colorTextTertiary,
+							}}
+						>
+							{formatCreatedAt(job.createdAt)}
+						</Text>
+					</Flex>
 				</Flex>
 			</Flex>
 		</List.Item>
