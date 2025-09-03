@@ -3,8 +3,8 @@ import { StatusTag } from '@/shared/components/StatusTag';
 import { MESSAGES } from '@/shared/constants';
 import { copyToClipboard } from '@/shared/utils/clipboard';
 import { useTranscriptionJobs } from '@/stores/jobs.store';
-import { CopyOutlined, FileTextOutlined, SyncOutlined } from '@ant-design/icons';
-import { Alert, Button, Empty, Flex, Result, Skeleton, theme, Typography } from 'antd';
+import { CopyOutlined, FileTextOutlined, SoundOutlined, SyncOutlined } from '@ant-design/icons';
+import { Alert, Button, Empty, Flex, Result, Skeleton, Space, theme, Typography } from 'antd';
 import React, { useEffect } from 'react';
 
 const { Title, Text, Paragraph } = Typography;
@@ -115,6 +115,32 @@ const TranscriptionParagraph: React.FC<{ text: string }> = ({ text }) => {
 	);
 };
 
+const AudioContent: React.FC<{ url: string; fileName: string }> = ({ url, fileName }) => {
+	const { token } = theme.useToken();
+	return (
+		<div
+			style={{
+				background: token.colorBgContainer,
+				border: `1px solid ${token.colorBorder}`,
+				borderRadius: token.borderRadius,
+				padding: '16px',
+			}}
+		>
+			<Space direction="vertical" style={{ width: '100%' }} size={12}>
+				<Space align="center">
+					<SoundOutlined style={{ color: token.colorTextSecondary }} />
+					<Text strong style={{ fontSize: 14 }}>
+						{fileName}
+					</Text>
+				</Space>
+				<audio controls style={{ width: '100%' }}>
+					<source src={url} />
+				</audio>
+			</Space>
+		</div>
+	);
+};
+
 export const JobContent: React.FC = () => {
 	const selectedJobId = useTranscriptionJobs((state) => state.selectedJobId);
 	const { data, loading, startPolling, stopPolling } = useGetTranscriptionJobQuery({
@@ -165,6 +191,13 @@ export const JobContent: React.FC = () => {
 						</Button>
 					</Flex>
 				</Flex>
+
+				{transcriptionJob.s3Url && (
+					<AudioContent
+						url={transcriptionJob.s3Url}
+						fileName={transcriptionJob.fileName}
+					/>
+				)}
 
 				<TranscriptionParagraph text={transcriptionJob.transcriptionText} />
 
