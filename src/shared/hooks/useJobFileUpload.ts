@@ -1,6 +1,6 @@
 import {
-	GetAllJobsDocument,
-	useConfirmFileUploadMutation,
+	GetTranscriptionJobsDocument,
+	useConfirmJobFileUploadMutation,
 	useCreateTranscriptionJobMutation,
 } from '@/generated/graphql';
 import { MESSAGES } from '@/shared/constants';
@@ -11,7 +11,7 @@ import { useCallback, useState } from 'react';
 
 export const useJobFileUpload = () => {
 	const [createJob] = useCreateTranscriptionJobMutation();
-	const [confirmUpload] = useConfirmFileUploadMutation();
+	const [confirmUpload] = useConfirmJobFileUploadMutation();
 	const client = useApolloClient();
 	const [uploading, setUploading] = useState(false);
 
@@ -22,8 +22,10 @@ export const useJobFileUpload = () => {
 			try {
 				const { data: createData } = await createJob({
 					variables: {
-						fileName: file.name,
-						contentType: file.type,
+						input: {
+							fileName: file.name,
+							contentType: file.type,
+						},
 					},
 				});
 
@@ -36,10 +38,10 @@ export const useJobFileUpload = () => {
 
 				await axios.put(uploadUrl, file);
 
-				await confirmUpload({ variables: { id: job.id } });
+				await confirmUpload({ variables: { jobId: job.id } });
 
 				client.refetchQueries({
-					include: [GetAllJobsDocument],
+					include: [GetTranscriptionJobsDocument],
 				});
 
 				message.success(MESSAGES.UPLOAD_SUCCESS);

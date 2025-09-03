@@ -1,24 +1,24 @@
-import { JobStatus } from '@/generated/graphql';
+import { TranscriptionJobStatus } from '@/generated/graphql';
 import { CheckCircleOutlined, ClockCircleOutlined, SyncOutlined } from '@ant-design/icons';
 import { Tag, TagProps } from 'antd';
 import React, { useMemo } from 'react';
 
 interface StatusTagProps {
-	status: JobStatus;
+	status: TranscriptionJobStatus;
 }
 
-const configs: Record<JobStatus, Pick<TagProps, 'icon' | 'color'> & { text: string }> = {
-	[JobStatus.Waiting]: {
+const configs: Record<TranscriptionJobStatus, Pick<TagProps, 'icon' | 'color'> & { text: string }> = {
+	[TranscriptionJobStatus.Waiting]: {
 		icon: <ClockCircleOutlined />,
 		color: 'orange' as const,
 		text: 'Waiting',
 	},
-	[JobStatus.Processing]: {
+	[TranscriptionJobStatus.Processing]: {
 		icon: <SyncOutlined spin />,
 		color: 'blue' as const,
 		text: 'Processing',
 	},
-	[JobStatus.Completed]: {
+	[TranscriptionJobStatus.Completed]: {
 		icon: <CheckCircleOutlined />,
 		color: 'green' as const,
 		text: 'Completed',

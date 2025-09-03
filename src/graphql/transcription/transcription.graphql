@@ -1,13 +1,13 @@
-query GetAllJobs {
-	jobs {
+query GetTranscriptionJobs {
+	transcriptionJobs {
 		id
 		status
 		fileName
 	}
 }
 
-query GetJob($id: ID!) {
-	job(id: $id) {
+query GetTranscriptionJob($id: ID!) {
+	transcriptionJob(id: $id) {
 		id
 		status
 		fileName
@@ -16,8 +16,8 @@ query GetJob($id: ID!) {
 	}
 }
 
-mutation CreateTranscriptionJob($fileName: String!, $contentType: String!) {
-	createTranscriptionJob(fileName: $fileName, contentType: $contentType) {
+mutation CreateTranscriptionJob($input: CreateTranscriptionJobInput!) {
+	createTranscriptionJob(input: $input) {
 		job {
 			id
 		}
@@ -25,8 +25,8 @@ mutation CreateTranscriptionJob($fileName: String!, $contentType: String!) {
 	}
 }
 
-mutation ConfirmFileUpload($id: ID!) {
-	confirmFileUpload(id: $id) {
+mutation ConfirmJobFileUpload($jobId: ID!) {
+	confirmJobFileUpload(jobId: $jobId) {
 		id
 	}
 }

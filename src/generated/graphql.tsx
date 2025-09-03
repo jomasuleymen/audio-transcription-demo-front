@@ -15,6 +15,12 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
+  DateTime: { input: any; output: any; }
+};
+
+export type CreateTranscriptionJobInput = {
+  contentType: Scalars['String']['input'];
+  fileName: Scalars['String']['input'];
 };
 
 export type CreateTranscriptionJobResponse = {
@@ -23,80 +29,80 @@ export type CreateTranscriptionJobResponse = {
   uploadUrl: Scalars['String']['output'];
 };
 
-export enum JobStatus {
-  Completed = 'COMPLETED',
-  Processing = 'PROCESSING',
-  Waiting = 'WAITING'
-}
-
 export type Mutation = {
   __typename?: 'Mutation';
-  confirmFileUpload: TranscriptionJob;
+  confirmJobFileUpload: TranscriptionJob;
   createTranscriptionJob: CreateTranscriptionJobResponse;
 };
 
 
-export type MutationConfirmFileUploadArgs = {
-  id: Scalars['ID']['input'];
+export type MutationConfirmJobFileUploadArgs = {
+  jobId: Scalars['ID']['input'];
 };
 
 
 export type MutationCreateTranscriptionJobArgs = {
-  contentType: Scalars['String']['input'];
-  fileName: Scalars['String']['input'];
+  input: CreateTranscriptionJobInput;
 };
 
 export type Query = {
   __typename?: 'Query';
-  job?: Maybe<TranscriptionJob>;
-  jobs: Array<TranscriptionJob>;
+  transcriptionJob: TranscriptionJob;
+  transcriptionJobs: Array<TranscriptionJob>;
 };
 
 
-export type QueryJobArgs = {
+export type QueryTranscriptionJobArgs = {
   id: Scalars['ID']['input'];
 };
 
 export type TranscriptionJob = {
   __typename?: 'TranscriptionJob';
+  completedAt?: Maybe<Scalars['DateTime']['output']>;
+  createdAt: Scalars['DateTime']['output'];
   fileName: Scalars['String']['output'];
   id: Scalars['ID']['output'];
-  s3Url: Scalars['String']['output'];
-  status: JobStatus;
+  s3Url?: Maybe<Scalars['String']['output']>;
+  status: TranscriptionJobStatus;
   transcriptionText?: Maybe<Scalars['String']['output']>;
 };
 
-export type GetAllJobsQueryVariables = Exact<{ [key: string]: never; }>;
+export enum TranscriptionJobStatus {
+  Completed = 'COMPLETED',
+  Processing = 'PROCESSING',
+  Waiting = 'WAITING'
+}
+
+export type GetTranscriptionJobsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAllJobsQuery = { __typename?: 'Query', jobs: Array<{ __typename?: 'TranscriptionJob', id: string, status: JobStatus, fileName: string }> };
+export type GetTranscriptionJobsQuery = { __typename?: 'Query', transcriptionJobs: Array<{ __typename?: 'TranscriptionJob', id: string, status: TranscriptionJobStatus, fileName: string }> };
 
-export type GetJobQueryVariables = Exact<{
+export type GetTranscriptionJobQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type GetJobQuery = { __typename?: 'Query', job?: { __typename?: 'TranscriptionJob', id: string, status: JobStatus, fileName: string, s3Url: string, transcriptionText?: string | null } | null };
+export type GetTranscriptionJobQuery = { __typename?: 'Query', transcriptionJob: { __typename?: 'TranscriptionJob', id: string, status: TranscriptionJobStatus, fileName: string, s3Url?: string | null, transcriptionText?: string | null } };
 
 export type CreateTranscriptionJobMutationVariables = Exact<{
-  fileName: Scalars['String']['input'];
-  contentType: Scalars['String']['input'];
+  input: CreateTranscriptionJobInput;
 }>;
 
 
 export type CreateTranscriptionJobMutation = { __typename?: 'Mutation', createTranscriptionJob: { __typename?: 'CreateTranscriptionJobResponse', uploadUrl: string, job: { __typename?: 'TranscriptionJob', id: string } } };
 
-export type ConfirmFileUploadMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+export type ConfirmJobFileUploadMutationVariables = Exact<{
+  jobId: Scalars['ID']['input'];
 }>;
 
 
-export type ConfirmFileUploadMutation = { __typename?: 'Mutation', confirmFileUpload: { __typename?: 'TranscriptionJob', id: string } };
+export type ConfirmJobFileUploadMutation = { __typename?: 'Mutation', confirmJobFileUpload: { __typename?: 'TranscriptionJob', id: string } };
 
 
-export const GetAllJobsDocument = gql`
-    query GetAllJobs {
-  jobs {
+export const GetTranscriptionJobsDocument = gql`
+    query GetTranscriptionJobs {
+  transcriptionJobs {
     id
     status
     fileName
@@ -105,39 +111,39 @@ export const GetAllJobsDocument = gql`
     `;
 
 /**
- * __useGetAllJobsQuery__
+ * __useGetTranscriptionJobsQuery__
  *
- * To run a query within a React component, call `useGetAllJobsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetAllJobsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useGetTranscriptionJobsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTranscriptionJobsQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useGetAllJobsQuery({
+ * const { data, loading, error } = useGetTranscriptionJobsQuery({
  *   variables: {
  *   },
  * });
  */
-export function useGetAllJobsQuery(baseOptions?: Apollo.QueryHookOptions<GetAllJobsQuery, GetAllJobsQueryVariables>) {
+export function useGetTranscriptionJobsQuery(baseOptions?: Apollo.QueryHookOptions<GetTranscriptionJobsQuery, GetTranscriptionJobsQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetAllJobsQuery, GetAllJobsQueryVariables>(GetAllJobsDocument, options);
+        return Apollo.useQuery<GetTranscriptionJobsQuery, GetTranscriptionJobsQueryVariables>(GetTranscriptionJobsDocument, options);
       }
-export function useGetAllJobsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAllJobsQuery, GetAllJobsQueryVariables>) {
+export function useGetTranscriptionJobsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTranscriptionJobsQuery, GetTranscriptionJobsQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetAllJobsQuery, GetAllJobsQueryVariables>(GetAllJobsDocument, options);
+          return Apollo.useLazyQuery<GetTranscriptionJobsQuery, GetTranscriptionJobsQueryVariables>(GetTranscriptionJobsDocument, options);
         }
-export function useGetAllJobsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetAllJobsQuery, GetAllJobsQueryVariables>) {
+export function useGetTranscriptionJobsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetTranscriptionJobsQuery, GetTranscriptionJobsQueryVariables>) {
           const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetAllJobsQuery, GetAllJobsQueryVariables>(GetAllJobsDocument, options);
+          return Apollo.useSuspenseQuery<GetTranscriptionJobsQuery, GetTranscriptionJobsQueryVariables>(GetTranscriptionJobsDocument, options);
         }
-export type GetAllJobsQueryHookResult = ReturnType<typeof useGetAllJobsQuery>;
-export type GetAllJobsLazyQueryHookResult = ReturnType<typeof useGetAllJobsLazyQuery>;
-export type GetAllJobsSuspenseQueryHookResult = ReturnType<typeof useGetAllJobsSuspenseQuery>;
-export type GetAllJobsQueryResult = Apollo.QueryResult<GetAllJobsQuery, GetAllJobsQueryVariables>;
-export const GetJobDocument = gql`
-    query GetJob($id: ID!) {
-  job(id: $id) {
+export type GetTranscriptionJobsQueryHookResult = ReturnType<typeof useGetTranscriptionJobsQuery>;
+export type GetTranscriptionJobsLazyQueryHookResult = ReturnType<typeof useGetTranscriptionJobsLazyQuery>;
+export type GetTranscriptionJobsSuspenseQueryHookResult = ReturnType<typeof useGetTranscriptionJobsSuspenseQuery>;
+export type GetTranscriptionJobsQueryResult = Apollo.QueryResult<GetTranscriptionJobsQuery, GetTranscriptionJobsQueryVariables>;
+export const GetTranscriptionJobDocument = gql`
+    query GetTranscriptionJob($id: ID!) {
+  transcriptionJob(id: $id) {
     id
     status
     fileName
@@ -148,40 +154,40 @@ export const GetJobDocument = gql`
     `;
 
 /**
- * __useGetJobQuery__
+ * __useGetTranscriptionJobQuery__
  *
- * To run a query within a React component, call `useGetJobQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetJobQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useGetTranscriptionJobQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTranscriptionJobQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useGetJobQuery({
+ * const { data, loading, error } = useGetTranscriptionJobQuery({
  *   variables: {
  *      id: // value for 'id'
  *   },
  * });
  */
-export function useGetJobQuery(baseOptions: Apollo.QueryHookOptions<GetJobQuery, GetJobQueryVariables> & ({ variables: GetJobQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+export function useGetTranscriptionJobQuery(baseOptions: Apollo.QueryHookOptions<GetTranscriptionJobQuery, GetTranscriptionJobQueryVariables> & ({ variables: GetTranscriptionJobQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetJobQuery, GetJobQueryVariables>(GetJobDocument, options);
+        return Apollo.useQuery<GetTranscriptionJobQuery, GetTranscriptionJobQueryVariables>(GetTranscriptionJobDocument, options);
       }
-export function useGetJobLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetJobQuery, GetJobQueryVariables>) {
+export function useGetTranscriptionJobLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTranscriptionJobQuery, GetTranscriptionJobQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetJobQuery, GetJobQueryVariables>(GetJobDocument, options);
+          return Apollo.useLazyQuery<GetTranscriptionJobQuery, GetTranscriptionJobQueryVariables>(GetTranscriptionJobDocument, options);
         }
-export function useGetJobSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetJobQuery, GetJobQueryVariables>) {
+export function useGetTranscriptionJobSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetTranscriptionJobQuery, GetTranscriptionJobQueryVariables>) {
           const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetJobQuery, GetJobQueryVariables>(GetJobDocument, options);
+          return Apollo.useSuspenseQuery<GetTranscriptionJobQuery, GetTranscriptionJobQueryVariables>(GetTranscriptionJobDocument, options);
         }
-export type GetJobQueryHookResult = ReturnType<typeof useGetJobQuery>;
-export type GetJobLazyQueryHookResult = ReturnType<typeof useGetJobLazyQuery>;
-export type GetJobSuspenseQueryHookResult = ReturnType<typeof useGetJobSuspenseQuery>;
-export type GetJobQueryResult = Apollo.QueryResult<GetJobQuery, GetJobQueryVariables>;
+export type GetTranscriptionJobQueryHookResult = ReturnType<typeof useGetTranscriptionJobQuery>;
+export type GetTranscriptionJobLazyQueryHookResult = ReturnType<typeof useGetTranscriptionJobLazyQuery>;
+export type GetTranscriptionJobSuspenseQueryHookResult = ReturnType<typeof useGetTranscriptionJobSuspenseQuery>;
+export type GetTranscriptionJobQueryResult = Apollo.QueryResult<GetTranscriptionJobQuery, GetTranscriptionJobQueryVariables>;
 export const CreateTranscriptionJobDocument = gql`
-    mutation CreateTranscriptionJob($fileName: String!, $contentType: String!) {
-  createTranscriptionJob(fileName: $fileName, contentType: $contentType) {
+    mutation CreateTranscriptionJob($input: CreateTranscriptionJobInput!) {
+  createTranscriptionJob(input: $input) {
     job {
       id
     }
@@ -204,8 +210,7 @@ export type CreateTranscriptionJobMutationFn = Apollo.MutationFunction<CreateTra
  * @example
  * const [createTranscriptionJobMutation, { data, loading, error }] = useCreateTranscriptionJobMutation({
  *   variables: {
- *      fileName: // value for 'fileName'
- *      contentType: // value for 'contentType'
+ *      input: // value for 'input'
  *   },
  * });
  */
@@ -216,36 +221,36 @@ export function useCreateTranscriptionJobMutation(baseOptions?: Apollo.MutationH
 export type CreateTranscriptionJobMutationHookResult = ReturnType<typeof useCreateTranscriptionJobMutation>;
 export type CreateTranscriptionJobMutationResult = Apollo.MutationResult<CreateTranscriptionJobMutation>;
 export type CreateTranscriptionJobMutationOptions = Apollo.BaseMutationOptions<CreateTranscriptionJobMutation, CreateTranscriptionJobMutationVariables>;
-export const ConfirmFileUploadDocument = gql`
-    mutation ConfirmFileUpload($id: ID!) {
-  confirmFileUpload(id: $id) {
+export const ConfirmJobFileUploadDocument = gql`
+    mutation ConfirmJobFileUpload($jobId: ID!) {
+  confirmJobFileUpload(jobId: $jobId) {
     id
   }
 }
     `;
-export type ConfirmFileUploadMutationFn = Apollo.MutationFunction<ConfirmFileUploadMutation, ConfirmFileUploadMutationVariables>;
+export type ConfirmJobFileUploadMutationFn = Apollo.MutationFunction<ConfirmJobFileUploadMutation, ConfirmJobFileUploadMutationVariables>;
 
 /**
- * __useConfirmFileUploadMutation__
+ * __useConfirmJobFileUploadMutation__
  *
- * To run a mutation, you first call `useConfirmFileUploadMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useConfirmFileUploadMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useConfirmJobFileUploadMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useConfirmJobFileUploadMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [confirmFileUploadMutation, { data, loading, error }] = useConfirmFileUploadMutation({
+ * const [confirmJobFileUploadMutation, { data, loading, error }] = useConfirmJobFileUploadMutation({
  *   variables: {
- *      id: // value for 'id'
+ *      jobId: // value for 'jobId'
  *   },
  * });
  */
-export function useConfirmFileUploadMutation(baseOptions?: Apollo.MutationHookOptions<ConfirmFileUploadMutation, ConfirmFileUploadMutationVariables>) {
+export function useConfirmJobFileUploadMutation(baseOptions?: Apollo.MutationHookOptions<ConfirmJobFileUploadMutation, ConfirmJobFileUploadMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<ConfirmFileUploadMutation, ConfirmFileUploadMutationVariables>(ConfirmFileUploadDocument, options);
+        return Apollo.useMutation<ConfirmJobFileUploadMutation, ConfirmJobFileUploadMutationVariables>(ConfirmJobFileUploadDocument, options);
       }
-export type ConfirmFileUploadMutationHookResult = ReturnType<typeof useConfirmFileUploadMutation>;
-export type ConfirmFileUploadMutationResult = Apollo.MutationResult<ConfirmFileUploadMutation>;
-export type ConfirmFileUploadMutationOptions = Apollo.BaseMutationOptions<ConfirmFileUploadMutation, ConfirmFileUploadMutationVariables>;
+export type ConfirmJobFileUploadMutationHookResult = ReturnType<typeof useConfirmJobFileUploadMutation>;
+export type ConfirmJobFileUploadMutationResult = Apollo.MutationResult<ConfirmJobFileUploadMutation>;
+export type ConfirmJobFileUploadMutationOptions = Apollo.BaseMutationOptions<ConfirmJobFileUploadMutation, ConfirmJobFileUploadMutationVariables>;

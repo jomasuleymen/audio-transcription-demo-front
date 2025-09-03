@@ -1,4 +1,8 @@
-import { GetAllJobsQuery, JobStatus, useGetAllJobsQuery } from '@/generated/graphql';
+import {
+	GetTranscriptionJobsQuery,
+	TranscriptionJobStatus,
+	useGetTranscriptionJobsQuery,
+} from '@/generated/graphql';
 import { StatusTag } from '@/shared/components/StatusTag';
 import { useTranscriptionJobs } from '@/stores/jobs.store';
 import { AudioOutlined } from '@ant-design/icons';
@@ -10,7 +14,7 @@ const { Text } = Typography;
 const JOBS_LIST_POLLING_INTERVAL = 2500;
 
 interface JobItemProps {
-	job: GetAllJobsQuery['jobs'][number];
+	job: GetTranscriptionJobsQuery['transcriptionJobs'][number];
 }
 
 const JobItem: React.FC<JobItemProps> = ({ job }) => {
@@ -69,14 +73,17 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
 };
 
 export const JobList: React.FC = () => {
-	const { data, loading, startPolling, stopPolling } = useGetAllJobsQuery({
+	const { data, loading, startPolling, stopPolling } = useGetTranscriptionJobsQuery({
 		fetchPolicy: 'no-cache',
 	});
 
+	const transcriptionJobs = data?.transcriptionJobs || [];
+
 	useEffect(() => {
-		const jobs = data?.jobs;
-		const hasActiveJobs = jobs?.some(
-			(job) => job.status === JobStatus.Processing || job.status === JobStatus.Waiting
+		const hasActiveJobs = transcriptionJobs.some(
+			(job) =>
+				job.status === TranscriptionJobStatus.Processing ||
+				job.status === TranscriptionJobStatus.Waiting
 		);
 
 		if (hasActiveJobs) {
@@ -86,7 +93,7 @@ export const JobList: React.FC = () => {
 		}
 
 		return () => stopPolling();
-	}, [data?.jobs, startPolling, stopPolling]);
+	}, [transcriptionJobs, startPolling, stopPolling]);
 
 	if (loading) {
 		return (
@@ -104,7 +111,7 @@ export const JobList: React.FC = () => {
 		);
 	}
 
-	if (!data?.jobs?.length) {
+	if (!transcriptionJobs.length) {
 		return (
 			<div style={{ padding: '32px 16px', textAlign: 'center' }}>
 				<Empty
@@ -117,7 +124,7 @@ export const JobList: React.FC = () => {
 
 	return (
 		<List
-			dataSource={data.jobs}
+			dataSource={transcriptionJobs}
 			renderItem={(item) => <JobItem key={item.id} job={item} />}
 			style={{ height: '100%', overflow: 'auto' }}
 		/>

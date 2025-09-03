@@ -1,4 +1,4 @@
-import { JobStatus, useGetJobQuery } from '@/generated/graphql';
+import { TranscriptionJobStatus, useGetTranscriptionJobQuery } from '@/generated/graphql';
 import { StatusTag } from '@/shared/components/StatusTag';
 import { MESSAGES } from '@/shared/constants';
 import { copyToClipboard } from '@/shared/utils/clipboard';
@@ -72,7 +72,7 @@ const ProcessingContent: React.FC = () => {
 				title="Processing Your Audio"
 				subTitle={
 					<div>
-						<StatusTag status={JobStatus.Processing} />
+						<StatusTag status={TranscriptionJobStatus.Processing} />
 						<Text type="secondary" style={{ marginTop: 8, display: 'block' }}>
 							Please wait while we transcribe your audio file. This usually takes a
 							few moments.
@@ -117,13 +117,16 @@ const TranscriptionParagraph: React.FC<{ text: string }> = ({ text }) => {
 
 export const JobContent: React.FC = () => {
 	const selectedJobId = useTranscriptionJobs((state) => state.selectedJobId);
-	const { data, loading, startPolling, stopPolling } = useGetJobQuery({
+	const { data, loading, startPolling, stopPolling } = useGetTranscriptionJobQuery({
 		variables: { id: selectedJobId! },
 		skip: !selectedJobId,
 	});
 
+	const transcriptionJob = data?.transcriptionJob;
+
 	const isProcessing =
-		data?.job?.status === JobStatus.Processing || data?.job?.status === JobStatus.Waiting;
+		transcriptionJob?.status === TranscriptionJobStatus.Processing ||
+		transcriptionJob?.status === TranscriptionJobStatus.Waiting;
 
 	useEffect(() => {
 		if (isProcessing) {
@@ -134,8 +137,8 @@ export const JobContent: React.FC = () => {
 	}, [isProcessing, startPolling, stopPolling]);
 
 	const handleCopyText = () => {
-		if (data?.job?.transcriptionText) {
-			copyToClipboard(data.job.transcriptionText);
+		if (transcriptionJob?.transcriptionText) {
+			copyToClipboard(transcriptionJob.transcriptionText);
 		}
 	};
 
@@ -143,7 +146,7 @@ export const JobContent: React.FC = () => {
 	if (loading) return <LoadingContent />;
 	if (isProcessing) return <ProcessingContent />;
 
-	if (!data?.job?.transcriptionText) return <NoTranscriptionContent />;
+	if (!transcriptionJob?.transcriptionText) return <NoTranscriptionContent />;
 
 	return (
 		<div style={{ padding: '24px', height: '100%', overflow: 'auto' }}>
@@ -151,7 +154,7 @@ export const JobContent: React.FC = () => {
 				<Flex justify="space-between" align="center">
 					<Title level={4}>Transcription</Title>
 					<Flex gap={8} align="center">
-						<StatusTag status={data.job.status} />
+						<StatusTag status={transcriptionJob.status} />
 						<Button
 							type="text"
 							icon={<CopyOutlined />}
@@ -163,10 +166,10 @@ export const JobContent: React.FC = () => {
 					</Flex>
 				</Flex>
 
-				<TranscriptionParagraph text={data.job.transcriptionText} />
+				<TranscriptionParagraph text={transcriptionJob.transcriptionText} />
 
 				<Text type="secondary" style={{ fontSize: 12, textAlign: 'center' }}>
-					File: {data.job.fileName}
+					File: {transcriptionJob.fileName}
 				</Text>
 			</Flex>
 		</div>
