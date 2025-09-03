@@ -9,7 +9,7 @@ import React, { useEffect } from 'react';
 
 const { Title, Text, Paragraph } = Typography;
 
-const POLLING_INTERVAL = 3000;
+const POLLING_INTERVAL = 2500;
 
 const IdleContent: React.FC = () => {
 	const { token } = theme.useToken();
